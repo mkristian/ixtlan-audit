@@ -1,0 +1,57 @@
+require 'slf4r/logger_facade'
+
+module Ixtlan
+  module Audit
+    class UserLogger
+
+      def initialize(audit_manager, log_category)
+        @manager = audit_manager
+        @logger = ::Slf4r::LoggerFacade.new(log_category)
+      end
+
+      private
+      
+      def login_from(controller)
+        user = controller.respond_to?(:current_user) ? controller.send(:current_user) : nil
+        user.nil? ? nil: user.send(@manager.username_method)
+      end
+      
+      public
+      
+      def log(controller, message = nil, &block)
+        log_user(login_from(controller), message, &block)
+      end
+      
+      def log_action(controller, message = nil)
+        log_user(login_from(controller)) do
+        as_xml = controller.response.content_type == 'application/xml' ? " - xml" : ""
+        if controller.params[:controller]
+          audits = controller.instance_variable_get("@#{controller.params[:controller].to_sym}")
+          if(audits)
+            "#{controller.params[:controller]}##{controller.params[:action]} #{audits.model.to_s.plural}[#{audits.size}]#{as_xml}#{message}"
+          else
+            audit = controller.instance_variable_get("@#{controller.params[:controller].singular.to_sym}")
+            if(audit)
+              errors = if(audit.respond_to?(:errors) && !audit.errors.empty?)
+                         " - errors: " + audit.errors.full_messages.join(", ")
+                       end
+              audit_log = audit.respond_to?(:to_log) ? audit.to_log : "#{audit.model}(#{audit.key})"
+              "#{controller.params[:controller]}##{controller.params[:action]} #{audit_log}#{as_xml}#{message}#{errors}"
+            else
+              "#{controller.params[:controller]}##{controller.params[:action]}#{as_xml}#{message}"
+            end
+          end
+        else
+          "params=#{controller.params.inspect}#{message}"
+        end
+      end
+    end
+
+    def log_user(user, message = nil, &block)
+      user ||= "???"
+      msg = "#{message}#{block.call if block}"
+      @manager.push( msg, user)
+      @logger.info {"[#{user}] #{msg}" } unless @manager.skip_logsystem?
+    end
+  end
+end
