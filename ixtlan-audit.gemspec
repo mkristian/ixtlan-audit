@@ -1,11 +1,11 @@
 # -*- mode: ruby -*-
 Gem::Specification.new do |s|
-  s.name = 'ixtlan-guard'
-  s.version = '0.2.0'
+  s.name = 'ixtlan-audit'
+  s.version = '0.1.0'
 
-  s.summary = 'guard your controller actions'
-  s.description = 'simple authorization framework for rails controllers'
-  s.homepage = 'http://github.com/mkristian/ixtlan-guard'
+  s.summary = 'audit the controller actions for the current user'
+  s.description = 'audit the controller actions for the current user. log that data into the database and allow to expire this log files (privacy protection) and be able to browse it from the UI'
+  s.homepage = 'http://github.com/mkristian/ixtlan-audit'
 
   s.authors = ['mkristian']
   s.email = ['m.kristian@web.de']

@@ -1,32 +1,27 @@
-require 'rails'
+require 'ixtlan/audit/manager'
+require 'ixtlan/audit/audit_rack'
+require 'ixtlan/audit/user_logger'
+
 
 module Ixtlan
   module Audit
-    class Railtie < Rails::Railtie
+    class Railtie < ::Rails::Railtie
 
       config.before_configuration do |app|
         app.config.class.class_eval do
-          attr_accessor :audit
+          attr_accessor :audit_manager
         end
-        app.config.audit = Ixtlan::Audit::Manager.new
-      end
-      
-      config.after_initialization do |app|
-        ::ActionController::Base.send(:include, Ixtlan::Audit::Base)
-      end
-    end
-
-    module Base
-      def self.included(base)
-        base.append_after_filter(AuditFilter)
-        base.append_before_filter(AuditCleanupFilter)
+        app.config.audit_manager = Manager.new
+        ::ActionController::Base.append_after_filter(Ixtlan::Audit::AuditFilter)
+        ::ActionController::Base.append_before_filter(Ixtlan::Audit::AuditCleanupFilter)
+        app.config.middleware.use Ixtlan::Audit::AuditRack
       end
     end
 
     class AuditFilter
 
       def self.logger
-        @logger ||= UserLogger.new(Rails.application.config.audit, Ixtlan::Audit)
+        @logger ||= UserLogger.new(Rails.application.config.audit_manager)
       end
 
       def self.filter(controller)
@@ -38,7 +33,7 @@ module Ixtlan
     class AuditCleanupFilter
 
       def self.filter(controller)
-        Rails.application.config.audit.daily_cleanup
+        Rails.application.config.audit_manager.daily_cleanup
       end
     end
   end
