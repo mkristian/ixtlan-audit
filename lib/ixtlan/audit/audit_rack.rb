@@ -11,7 +11,6 @@ module Ixtlan
       
       def call(env)
         result = @app.call(env)
-p audits_path
         ::Rails.application.config.audit_manager.save_all
         result
       end
