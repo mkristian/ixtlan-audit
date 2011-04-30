@@ -21,7 +21,7 @@ module Ixtlan
     class AuditFilter
 
       def self.logger
-        @logger ||= UserLogger.new(Rails.application.config.audit_manager)
+        @logger ||= UserLogger.new(Rails.configuration.audit_manager)
       end
 
       def self.filter(controller)

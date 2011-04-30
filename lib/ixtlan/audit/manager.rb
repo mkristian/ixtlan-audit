@@ -42,7 +42,13 @@ module Ixtlan
 
       def save_all
         list.each do |audit|
-          audit.save
+          begin
+            audit.save
+          rescue => e
+            warn "unexpected error - skip entry"
+            warn e.message
+            warn audit
+          end
         end
         list.clear
       end
