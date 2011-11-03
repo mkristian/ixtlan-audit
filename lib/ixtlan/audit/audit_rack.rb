@@ -2,8 +2,9 @@ module Ixtlan
   module Audit
     class AuditRack
 
-      def initialize(app)
+      def initialize(app, audit_manager)
         @app = app
+        @audit_manager = audit_manager
         self.class_eval do
           include Rails.application.routes.url_helpers
         end
@@ -11,7 +12,7 @@ module Ixtlan
       
       def call(env)
         result = @app.call(env)
-        ::Rails.application.config.audit_manager.save_all
+        @audit_manager.save_all
         result
       end
       

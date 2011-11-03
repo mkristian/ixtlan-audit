@@ -27,11 +27,11 @@ module Ixtlan
         log_user(login_from(controller)) do
           as_xml = controller.response.content_type == 'application/xml' ? " - xml" : ""
           if controller.params[:controller]
-            audits = controller.instance_variable_get("@#{controller.params[:controller].to_sym}")
+            audits = controller.instance_variable_get("@#{controller.params[:controller]}")
             if(audits)
-              "#{controller.params[:controller]}##{controller.params[:action]} #{audits.class.name.to_s.pluralize}[#{audits.size}]#{as_xml}#{message}"
+              "#{controller.params[:controller]}##{controller.params[:action]} #{controller.params[:action].classify}[#{audits.size}]#{as_xml}#{message}"
             else
-              audit = controller.instance_variable_get("@#{controller.params[:controller].singularize.to_sym}")
+              audit = controller.instance_variable_get("@#{controller.params[:controller].singularize}")
               if(audit)
                 errors = if(audit.respond_to?(:errors) && !audit.errors.empty?)
                            " - errors: " + audit.errors.full_messages.join(", ")

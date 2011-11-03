@@ -23,10 +23,13 @@ Gem::Specification.new do |s|
   s.test_files += Dir['spec/**/*_spec.rb']
   s.test_files += Dir['features/*.feature']
   s.test_files += Dir['features/step_definitions/*.rb']
-  s.add_development_dependency 'rails', '3.0.1'
-  s.add_development_dependency 'rspec', '2.0.1'
-  s.add_development_dependency 'cucumber', '0.9.4'
+  s.add_dependency 'slf4r', '~> 0.4.2'
+  s.add_development_dependency 'rspec', '2.6.0'
   s.add_development_dependency 'rake', '0.8.7'
+  DM_VERSION = '1.2.0'
+  s.add_development_dependency 'dm-core', DM_VERSION
+  s.add_development_dependency 'dm-migrations', DM_VERSION
+  s.add_development_dependency 'dm-sqlite-adapter', DM_VERSION
 end
 
 # vim: syntax=Ruby

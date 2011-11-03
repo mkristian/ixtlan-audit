@@ -20,9 +20,9 @@ module Ixtlan
 
       def initialize
         @username_method = :login
-        @keep_log = 90
+        @keep_logs = 90
       end
-
+      
       def username_method=(method)
         @username_method = method.to_sym if method
       end
@@ -31,8 +31,9 @@ module Ixtlan
         @model = m if m
       end
 
-      def keep_log=(days)
-        @keep_log = days.to_i
+      def keep_logs=(days)
+        @keep_logs = days.to_i
+        daily_cleanup
       end
       
       def push(message, username)
@@ -41,6 +42,7 @@ module Ixtlan
       end
 
       def save_all
+        daily_cleanup
         list.each do |audit|
           begin
             audit.save
@@ -58,20 +60,28 @@ module Ixtlan
       end
 
       def daily_cleanup
-        if @model
-          if(!@last_cleanup.nil? && @last_cleanup < 1.days.ago)
+        if model
+          if(@last_cleanup.nil? || @last_cleanup < 1.days.ago)
             @last_cleanup = Date.today
             begin
-              if defined? ::DataMapper
-                @model.all(:date.lt => @keep_log.days.ago).destroy!
-              else # ActiveRecord
-                @model.all(:conditions => ["date < ?", @keep_log.days.ago]).each(&:delete)
-              end
-              @logger.info("cleaned audit logs")
-            rescue Error
-              # TODO log this !!
+              delete_all
+              logger.info("cleaned audit logs")
+            rescue Exception => e
+              logger.error("cleanup audit logs", e)
             end
           end
+        end
+      end
+
+      private
+
+      if defined? ::DataMapper
+        def delete_all
+          model.all(:created_at.lte => @keep_logs.days.ago).destroy!
+        end
+      else # ActiveRecord
+        def delete_all
+          model.all(:conditions => ["created_at <= ?", @keep_logs.days.ago]).each(&:delete)
         end
       end
     end
