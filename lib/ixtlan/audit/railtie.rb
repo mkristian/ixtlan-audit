@@ -11,7 +11,7 @@ module Ixtlan
         app.config.audit_manager = Manager.new
         ::ActionController::Base.send(:include, Module)
         ::ActionController::Base.send(:after_filter, :audit)
-        app.config.middleware.use AuditRack, app.config.audit_manager
+        app.config.middleware.use(AuditRack, app.config.audit_manager)
       end
     end
     

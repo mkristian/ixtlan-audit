@@ -32,8 +32,9 @@ module Ixtlan
       end
 
       def keep_logs=(days)
+        old = @keep_logs
         @keep_logs = days.to_i
-        daily_cleanup
+        daily_cleanup if old != @keep_logs
       end
       
       def push(message, username)
@@ -62,7 +63,7 @@ module Ixtlan
       def daily_cleanup
         if model
           if(@last_cleanup.nil? || @last_cleanup < 1.days.ago)
-            @last_cleanup = Date.today
+            @last_cleanup = 0.days.ago # to have the right type
             begin
               delete_all
               logger.info("cleaned audit logs")

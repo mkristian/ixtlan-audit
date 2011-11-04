@@ -29,7 +29,7 @@ module Ixtlan
           if controller.params[:controller]
             audits = controller.instance_variable_get("@#{controller.params[:controller]}")
             if(audits)
-              "#{controller.params[:controller]}##{controller.params[:action]} #{controller.params[:action].classify}[#{audits.size}]#{as_xml}#{message}"
+              "#{controller.params[:controller]}##{controller.params[:action]} #{controller.params[:controller].classify}[#{audits.size}]#{as_xml}#{message}"
             else
               audit = controller.instance_variable_get("@#{controller.params[:controller].singularize}")
               if(audit)
