@@ -27,19 +27,27 @@ module Ixtlan
         log_user(login_from(controller)) do
           as_xml = controller.response.content_type == 'application/xml' ? " - xml" : ""
           if controller.params[:controller]
-            audits = controller.instance_variable_get("@#{controller.params[:controller]}")
+            clname = controller.params[:controller]
+            cname = clname.sub(/^.*\//, '')
+            audits = controller.instance_variable_get("@#{cname}")
             if(audits)
-              "#{controller.params[:controller]}##{controller.params[:action]} #{controller.params[:controller].classify}[#{audits.size}]#{as_xml}#{message}"
+              "#{clname}##{controller.params[:action]} #{cname.classify}[#{audits.size}]#{as_xml}#{message}"
             else
-              audit = controller.instance_variable_get("@#{controller.params[:controller].singularize}")
+              audit = controller.instance_variable_get("@#{cname.singularize}")
               if(audit)
                 errors = if(audit.respond_to?(:errors) && !audit.errors.empty?)
                            " - errors: " + audit.errors.full_messages.join(", ")
                          end
-                audit_log = audit.respond_to?(:to_log) ? audit.to_log : "#{audit.class.name}(#{audit.id})"
-                "#{controller.params[:controller]}##{controller.params[:action]} #{audit_log}#{as_xml}#{message}#{errors}"
+                audit_log = if audit.respond_to?(:to_log)
+                              audit.to_log
+                            elsif audit.is_a? String
+                              audit
+                            else
+                              "#{audit.class.name}(#{audit.id})"
+                            end
+                "#{clname}##{controller.params[:action]} #{audit_log}#{as_xml}#{message}#{errors}"
               else
-                "#{controller.params[:controller]}##{controller.params[:action]}#{as_xml}#{message}"
+                "#{clname}##{controller.params[:action]}#{as_xml}#{message}"
               end
             end
           else
