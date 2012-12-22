@@ -25,15 +25,14 @@ module Ixtlan
       
       def log_action(controller, message = nil)
         log_user(login_from(controller)) do
-          as_xml = controller.response.content_type == 'application/xml' ? " - xml" : ""
           if controller.params[:controller]
             clname = controller.params[:controller]
             cname = clname.sub(/^.*\//, '')
             audits = controller.instance_variable_get("@#{cname}")
-            if(audits)
-              "#{clname}##{controller.params[:action]} #{cname.classify}[#{audits.size}]#{as_xml}#{message}"
+            if(audits && audits.respond_to?(:collect))
+              "#{clname}##{controller.params[:action]} #{cname.classify}[#{audits.size}]#{message}"
             else
-              audit = controller.instance_variable_get("@#{cname.singularize}")
+              audit = audits || controller.instance_variable_get("@#{cname.singularize}")
               if(audit)
                 errors = if(audit.respond_to?(:errors) && !audit.errors.empty?)
                            " - errors: " + audit.errors.full_messages.join(", ")
@@ -42,12 +41,14 @@ module Ixtlan
                               audit.to_log
                             elsif audit.is_a? String
                               audit
+                            elsif audit.respond_to?(:model)
+                              "#{audit.model}(#{audit.id})"
                             else
                               "#{audit.class.name}(#{audit.id})"
                             end
-                "#{clname}##{controller.params[:action]} #{audit_log}#{as_xml}#{message}#{errors}"
+                "#{clname}##{controller.params[:action]} #{audit_log}#{message}#{errors}"
               else
-                "#{clname}##{controller.params[:action]}#{as_xml}#{message}"
+                "#{clname}##{controller.params[:action]}#{message}"
               end
             end
           else
