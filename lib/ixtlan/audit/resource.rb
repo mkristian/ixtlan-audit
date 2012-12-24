@@ -7,6 +7,7 @@ module Ixtlan
       property :id, Serial
       
       property :login, String
+      property :path, String
       property :message, String
       
       property :created_at, DateTime

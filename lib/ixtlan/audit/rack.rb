@@ -1,6 +1,6 @@
 module Ixtlan
   module Audit
-    class AuditRack
+    class Rack
 
       def initialize(app, audit_manager)
         @app = app

@@ -14,7 +14,7 @@ module Ixtlan
       
       def login_from(controller)
         user = controller.respond_to?(:current_user) ? controller.send(:current_user) : nil
-        user.nil? ? nil: user.send(@manager.username_method)
+        user.nil? ? nil: (user.respond_to?(:login) ? user.login : user.username)
       end
       
       public
@@ -60,7 +60,7 @@ module Ixtlan
       def log_user(user, message = nil, &block)
         user ||= "???"
         msg = "#{message}#{block.call if block}"
-        @manager.push( msg, user)
+        @manager.push( user, msg.sub(/\ .*$/, ''), msg )
         logger.debug {"[#{user}] #{msg}" }
       end
     end

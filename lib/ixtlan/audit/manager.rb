@@ -1,44 +1,66 @@
-require 'slf4r/logger'
-
 module Ixtlan
   module Audit
     class Manager
 
       private
 
-      include ::Slf4r::Logger
+      if defined? ::Slf4r
+        include ::Slf4r::Logger
+      else
+        require 'logger'
+        def logger
+          @logger ||= Logger.new( STDOUT )
+        end
+      end
 
       def list
         Thread.current[:audit] ||= []
       end
 
-      def model
-        @model ||= (::Audit rescue nil)
-      end
-
       public
 
-      def initialize
-        @username_method = :login
+      attr_accessor :model, :block, :keep_logs
+
+      def initialize( model = nil, &block )
+        @model = model
         @keep_logs = 90
-      end
-      
-      def username_method=(method)
-        @username_method = method.to_sym if method
-      end
-      
-      def model=(m)
-        @model = m if m
+        block.call( self ) if block
+        @block = block
       end
 
-      def keep_logs=(days)
+      def model
+        @model ||= (Ixtlan::Audit::Audit rescue nil)
+      end
+
+      def keep_logs=( keep )
         old = @keep_logs
-        @keep_logs = days.to_i
+        @keep_logs = keep
         daily_cleanup if old != @keep_logs
       end
+
+      def keep_logs
+        if block
+          keep_logs = block.call
+        end
+        @keep_logs
+      end
       
-      def push(message, username)
-        list << model.new(:message => message, :login => username) if model
+      def push( username, path, obj )
+        if model
+          message = 
+            if !obj.is_a?( String ) && obj.respond_to?( :collect )
+              if o = obj.first
+                "#{o.class}[ #{obj.size} ]"
+              else
+                "[ 0 ] - <EMPTY ARRAY>"
+              end
+            else
+              obj.to_s
+            end
+          list << model.new( :path => path, 
+                             :message => message, 
+                             :login => username || '???' )
+        end
         list.last
       end
 
@@ -56,33 +78,29 @@ module Ixtlan
         list.clear
       end
 
-      def username_method
-        @username_method
-      end
-
       def daily_cleanup
-        if model
-          if(@last_cleanup.nil? || @last_cleanup < 1.days.ago)
-            @last_cleanup = 0.days.ago # to have the right type
-            begin
-              delete_all
-              logger.info("cleaned audit logs")
-            rescue Exception => e
-              logger.error("cleanup audit logs", e)
-            end
+        return unless model
+        now = DateTime.now
+        if(@last_cleanup.nil? || @last_cleanup < (now - 1))
+          @last_cleanup = now
+          begin
+            delete_all( now - keep_logs )
+            logger.info "cleaned audit logs"
+          rescue Exception => e
+            logger.warn "error cleaning up audit logs: #{e.message}" 
           end
         end
       end
-
+  
       private
 
       if defined? ::DataMapper
-        def delete_all
-          model.all(:created_at.lte => @keep_logs.days.ago).destroy!
+        def delete_all( expired )
+          model.all( :created_at.lte => expired ).destroy!
         end
       else # ActiveRecord
-        def delete_all
-          model.all(:conditions => ["created_at <= ?", @keep_logs.days.ago]).each(&:delete)
+        def delete_all( expired )
+          model.all( :conditions => ["created_at <= ?", expired] ).each(&:delete)
         end
       end
     end
