@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.description = 'audit the controller actions for the current user. log that data into the database and allow to expire this log files (privacy protection) and be able to browse it from the UI'
   s.homepage = 'http://github.com/mkristian/ixtlan-audit'
 
-  s.authors = ['mkristian']
+  s.authors = ['Christian Meier']
   s.email = ['m.kristian@web.de']
 
   s.files = Dir['MIT-LICENSE']
