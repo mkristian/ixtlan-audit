@@ -1,4 +1,0 @@
-h1. Rails Audit Log
-
-p. once you have a logged in user in your system, the usual request log can be improved by added the login name of the user to log output. but since you associate data with a "real" person privacy comes into play. the best privacy protection is not to store data, but in our case the compromise is to just define how long the data shall be stored (define an expiration date for the data).
-
