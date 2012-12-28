@@ -24,8 +24,8 @@ Gem::Specification.new do |s|
   s.test_files += Dir['features/*.feature']
   s.test_files += Dir['features/step_definitions/*.rb']
   s.add_dependency 'slf4r', '~> 0.4.2'
-  s.add_development_dependency 'rspec', '2.6.0'
-  s.add_development_dependency 'rake', '0.8.7'
+  s.add_development_dependency 'rspec', '~> 2.6'
+  s.add_development_dependency 'rake', '~> 10.0.3'
   s.add_development_dependency 'dm-core', '1.2.0'
   s.add_development_dependency 'dm-migrations', '1.2.0'
   s.add_development_dependency 'dm-sqlite-adapter', '1.2.0'
