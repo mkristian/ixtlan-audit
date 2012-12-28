@@ -60,7 +60,7 @@ module Ixtlan
 
       def keep_logs
         if block
-          keep_logs = block.call
+          block.call( self )
         end
         @keep_logs
       end
