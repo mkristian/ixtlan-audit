@@ -23,9 +23,10 @@ require 'ixtlan/audit/rack'
 module Ixtlan
   module Audit
     module CubaPlugin
-      def audit( obj, args )
-        if args[ :audit ] != false
-          username = current_user_name if respond_to?( :current_user_name )
+      def audit( obj, options = {} )
+        if options[ :audit ] != false
+          username = options[ :username ]
+          username ||= current_user_name if respond_to?( :current_user_name )
           audit_manager.push( username, env['SCRIPT_NAME'], obj )
         end
         obj

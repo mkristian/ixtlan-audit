@@ -35,6 +35,10 @@ module Ixtlan
       before :save do
         self.created_at = DateTime.now
       end
+
+      def to_s
+        "Audit( #{id} )"
+      end
     end
   end
 end
