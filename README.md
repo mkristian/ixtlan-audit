@@ -1,6 +1,6 @@
 # ixtlan audit #
 
-* [![Build Status](https://secure.travis-ci.org/mkristian/audit.png)](http://travis-ci.org/mkristian/audit) 
+* [![Build Status](https://secure.travis-ci.org/mkristian/ixtlan-audit.png)](http://travis-ci.org/mkristian/ixtlan-audit) 
 * [![Dependency Status](https://gemnasium.com/mkristian/ixtlan-audit.png)](https://gemnasium.com/mkristian/ixtlan-audit)
 * [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/mkristian/ixtlan-audit)
 
