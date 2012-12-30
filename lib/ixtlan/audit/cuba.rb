@@ -25,6 +25,9 @@ module Ixtlan
   module Audit
     class Cuba < ::CubaAPI
       define do
+        on get, 'last' do |number|
+          write Ixtlan::Audit::Audit.all.last
+        end
         on get, :numder do |number|
           write Ixtlan::Audit::Audit.get!( number.to_i )
         end
