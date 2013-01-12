@@ -89,10 +89,11 @@ module Ixtlan
         list.each do |audit|
           begin
             audit.save
+            warn audit.errors.inspect unless audit.valid?
           rescue => e
             warn "unexpected error - skip entry"
             warn e.message
-            warn audit
+            warn audit.inspect
           end
         end
         list.clear
