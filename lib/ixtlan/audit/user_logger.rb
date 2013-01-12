@@ -18,14 +18,19 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'slf4r/logger'
-
 module Ixtlan
   module Audit
     class UserLogger
 
-      include ::Slf4r::Logger
-      
+      if defined? ::Slf4r
+        include ::Slf4r::Logger
+      else
+        require 'logger'
+        def logger
+          @logger ||= Logger.new( STDOUT )
+        end
+      end
+
       def initialize(audit_manager)
         @manager = audit_manager
       end
@@ -80,7 +85,7 @@ module Ixtlan
       def log_user(user, message = nil, &block)
         user ||= "???"
         msg = "#{message}#{block.call if block}"
-        @manager.push( user, msg.sub(/\ .*$/, ''), msg )
+        @manager.push( user, msg.sub(/\ .*$/, ''), msg.sub(/^[^\ ]*\ /, '') )
         logger.debug {"[#{user}] #{msg}" }
       end
     end
