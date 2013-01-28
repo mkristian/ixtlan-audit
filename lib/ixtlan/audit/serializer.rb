@@ -25,9 +25,15 @@ module Ixtlan
 
       root 'audit'
       
-      add_context( :single )
+      add_context( :single,
+                   :except => [:created_by_id],
+                   :include => {
+                     :created_by => {
+                       :only => [:id, :login, :name]
+                     }
+                   } )
       
-      add_context( :collection, :except => [:created_at] )
+      add_context( :collection, :except => [:created_at, :created_by_id] )
     end
   end
 end

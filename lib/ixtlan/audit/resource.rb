@@ -24,14 +24,24 @@ module Ixtlan
     class Audit
       include DataMapper::Resource
 
+      def self.storage_name(arg)
+        'ixtlan_audits'
+      end
+
       property :id, Serial
       
-      property :login, String
-      property :path, String
-      property :message, String
-      
+      property :login, String, :length => 32
+      property :method, String, :length => 8
+      property :path, String, :length => 64
+      property :message, String, :length => 192      
       property :created_at, DateTime
       
+      if defined?( ::User ) && ::User.respond_to?( :properties ) # DataMapper
+        belongs_to :created_by, ::User, :required => false
+      elsif defined?( Ixtlan::UserManagement::User ) && Ixtlan::UserManagement::User.respond_to?( :properties ) # DataMapper
+        belongs_to :created_by, Ixtlan::UserManagement::User, :required => false
+      end
+
       before :save do
         self.created_at = DateTime.now
       end

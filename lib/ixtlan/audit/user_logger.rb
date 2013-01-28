@@ -85,7 +85,7 @@ module Ixtlan
       def log_user(user, message = nil, &block)
         user ||= "???"
         msg = "#{message}#{block.call if block}"
-        @manager.push( user, msg.sub(/\ .*$/, ''), msg.sub(/^[^\ ]*\ /, '') )
+        @manager.push( user, '', msg.sub(/\ .*$/, ''), msg.sub(/^[^\ ]*\ /, '') )
         logger.debug {"[#{user}] #{msg}" }
       end
     end

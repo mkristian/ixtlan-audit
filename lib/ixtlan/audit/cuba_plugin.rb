@@ -27,7 +27,8 @@ module Ixtlan
         if options[ :audit ] != false
           username = options[ :username ]
           username ||= current_user_name if respond_to?( :current_user_name )
-          audit_manager.push( username, env['SCRIPT_NAME'], obj )
+          user = respond_to?( :current_user ) ? current_user : nil
+          audit_manager.push( username, req.request_method, env['SCRIPT_NAME'], obj, user )
         end
         obj
       end

@@ -65,7 +65,7 @@ module Ixtlan
         @keep_logs
       end
       
-      def push( username, path, obj )
+      def push( username, method, path, obj, user = nil )
         if model
           message = 
             if !obj.is_a?( String ) && obj.respond_to?( :collect )
@@ -77,9 +77,12 @@ module Ixtlan
             else
               obj.to_s
             end
-          list << model.new( :path => path, 
-                             :message => message, 
-                             :login => username || '???' )
+          m =  model.new( :method => method,
+                          :path => path, 
+                          :message => message, 
+                          :login => username || '???' )
+          m.created_by = user if user && m.respond_to?( :created_by ) && user.respond_to?( :new? ) && !user.new?
+          list << m
         end
         list.last
       end
