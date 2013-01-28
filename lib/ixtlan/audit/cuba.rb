@@ -25,14 +25,17 @@ module Ixtlan
   module Audit
     class Cuba < ::CubaAPI
       define do
-        on get, 'last' do |number|
-          write Ixtlan::Audit::Audit.all.last
+        on get, 'last' do
+          write Ixtlan::Audit::Audit.last
         end
-        on get, :numder do |number|
+        on get, :number do |number|
           write Ixtlan::Audit::Audit.get!( number.to_i )
         end
         on get do
-          write Ixtlan::Audit::Audit.all.reverse
+          query = {}
+          query[ :login ] = req[ :login ] if req[ :login ]
+          query[ :path.like ] = '%' + req[ :path ] + '%' if req[ :path ]
+          write Ixtlan::Audit::Audit.all( query ).reverse
         end
       end
     end
