@@ -31,7 +31,7 @@ module Ixtlan
       property :id, Serial
       
       property :login, String, :length => 32
-      property :method, String, :length => 8
+      property :http_method, String, :length => 8, :field => 'method'
       property :path, String, :length => 64
       property :message, String, :length => 192      
       property :created_at, DateTime

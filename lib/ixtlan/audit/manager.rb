@@ -65,7 +65,7 @@ module Ixtlan
         @keep_logs
       end
       
-      def push( username, method, path, obj, user = nil )
+      def push( username, http_method, path, obj, user = nil )
         if model
           message = 
             if !obj.is_a?( String ) && obj.respond_to?( :collect )
@@ -77,7 +77,7 @@ module Ixtlan
             else
               obj.to_s
             end
-          m =  model.new( :method => method,
+          m =  model.new( :http_method => http_method,
                           :path => path, 
                           :message => message, 
                           :login => username || '???' )
@@ -92,7 +92,9 @@ module Ixtlan
         list.each do |audit|
           begin
             audit.save
-            warn audit.errors.inspect unless audit.valid?
+            if ( audit.respond_to?( :errors ) && audit.errors.size > 0 )
+              warn audit.errors.inspect
+            end
           rescue => e
             warn "unexpected error - skip entry"
             warn e.message
