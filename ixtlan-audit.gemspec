@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 Gem::Specification.new do |s|
   s.name = 'ixtlan-audit'
-  s.version = '0.4.0'
+  s.version = '0.4.1'
 
   s.summary = 'audit the controller actions for the current user'
   s.description = 'audit the controller actions for the current user. log that data into the database and allow to expire this log files (privacy protection) and be able to browse it from the UI'
