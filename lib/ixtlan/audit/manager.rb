@@ -27,9 +27,16 @@ module Ixtlan
       if defined? ::Slf4r
         include ::Slf4r::Logger
       else
-        require 'logger'
+        class Log
+          def info( msg )
+            puts "[Ixtlan::Audits] #{msg}"
+          end
+          def warn( msg )
+            warn "[Ixtlan::Audits] #{msg}"
+          end
+        end
         def logger
-          @logger ||= Logger.new( STDOUT )
+          @logger ||= Log.new
         end
       end
 
@@ -87,9 +94,9 @@ module Ixtlan
         list.last
       end
 
-      def save_all
+      def save_all( l = list )
         daily_cleanup
-        list.each do |audit|
+        l.each do |audit|
           begin
             audit.save
             if ( audit.respond_to?( :errors ) && audit.errors.size > 0 )
