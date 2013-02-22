@@ -22,17 +22,48 @@ module Ixtlan
   module Audit
     class Rack
 
+      def self.runner( manager )
+        @runner ||= Thread.new do
+          while true do
+            sleep 1
+            while not queue.empty?
+              list = queue.pop
+              manager.save_all( list )
+            end
+          end
+        end
+      end
+
+      def self.queue
+        @queue ||= Queue.new
+      end
+
       def initialize(app, audit_manager)
         @app = app
         @audit_manager = audit_manager
+        self.class.runner( audit_manager )
       end
       
       def call(env)
         result = @app.call(env)
-        @audit_manager.save_all
+        self.class.queue.push( @audit_manager.send( :list ) )
         result
       end
       
+      if defined? Thread
+        def save_all
+          l = @audit_manager.send :list
+          f = Thread.new do
+            sleep 0.1
+            @audit_manager.save_all( l )
+          end
+        end
+      else
+        def save_all
+          @audit_manager.save_all
+        end
+      end
     end
+    Rack.queue
   end
 end
