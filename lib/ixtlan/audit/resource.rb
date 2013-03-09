@@ -24,7 +24,7 @@ module Ixtlan
     class Audit
       include DataMapper::Resource
 
-      def self.storage_name(arg)
+      def self.storage_name( arg = :default )
         'ixtlan_audits'
       end
 
