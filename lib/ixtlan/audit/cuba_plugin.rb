@@ -39,8 +39,7 @@ module Ixtlan
       
       def self.included( base )
         base.prepend_aspect :audit
-        manager = Manager.new
-        base[ :audit_manager ] = manager
+        manager = base[ :audit_manager ] ||= Manager.new
         base.use( Rack, manager)
       end
     end

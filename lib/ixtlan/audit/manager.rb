@@ -46,7 +46,7 @@ module Ixtlan
 
       public
 
-      attr_accessor :model, :block, :keep_logs
+      attr_accessor :model, :block, :keep_logs, :dump_to_console
 
       def initialize( model = nil, &block )
         @model = model
@@ -71,13 +71,19 @@ module Ixtlan
         end
         @keep_logs
       end
-      
+
+      def dump_to_console
+        keep_logs == 0
+      end
+
       def push( username, http_method, path, obj, user = nil )
         if model
-          message = 
-            if !obj.is_a?( String ) && obj.respond_to?( :collect )
+          message =
+            if obj.respond_to?( :errors ) && obj.errors.size > 0
+              "#{obj.class} - errors: " + obj.errors.collect{ |e| e }.join( '. ' )
+            elsif !obj.is_a?( String ) && obj.respond_to?( :collect )
               if o = obj.first
-                "#{o.class}[ #{obj.size} ]"
+                "#{o.class} - size: #{obj.size}"
               else
                 "[ 0 ] - <EMPTY ARRAY>"
               end
@@ -90,6 +96,7 @@ module Ixtlan
                           :login => username || '???' )
           m.created_by = user if user && m.respond_to?( :created_by ) && user.respond_to?( :new? ) && !user.new?
           list << m
+          logger.info( "[#{username}] #{http_method} #{path} #{message}" ) if dump_to_console
         end
         list.last
       end
