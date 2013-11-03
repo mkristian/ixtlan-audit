@@ -46,6 +46,11 @@ module Ixtlan
         self.created_at = DateTime.now
       end
 
+      def message=( msg )
+        #truncate if too long
+        super msg[0..191]
+      end
+
       def to_s
         "Audit( #{id} )"
       end
