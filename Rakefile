@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 
 require 'rspec/core/rake_task'
+#require 'maven/ruby/tasks'
 
 RSpec::Core::RakeTask.new(:spec)
 
